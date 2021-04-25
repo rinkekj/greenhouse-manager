@@ -1,0 +1,70 @@
+{% extends 'layouts/base.html' %}
+{% import 'macros/form_macros.html' as f %}
+
+{% block content %}
+    <div class="ui grid container">
+        <div class="eight wide computer sixteen wide mobile centered column">
+            <a class="ui basic compact button" href="{{ url_for('main.supplier_list') }}">
+                <i class="caret left icon"></i>
+                Back to Suppliers
+            </a>
+            <h2 class="ui dividing header">{{title}}</h2>
+
+            {% set flashes = {
+                'error':   get_flashed_messages(category_filter=['form-error']),
+                'warning': get_flashed_messages(category_filter=['form-check-email']),
+                'info':    get_flashed_messages(category_filter=['form-info']),
+                'success': get_flashed_messages(category_filter=['form-success'])
+            } %}
+
+            {{ f.render_form_field(form.addEdit) }}
+
+            {{ f.begin_form(form, flashes) }}
+            <h3>Company</h3>
+
+            {{ f.render_form_field(form.companyName) }}
+            {{ f.render_form_field(form.address) }}
+            {{ f.render_form_field(form.city) }}
+            {{ f.render_form_field(form.state) }}
+            {{ f.render_form_field(form.zip) }}
+
+            <h3>Contact</h3>
+            <div class="two fields">
+                {{ f.render_form_field(form.firstName) }}
+                {{ f.render_form_field(form.lastName) }}
+            </div>
+
+            {{ f.render_form_field(form.email) }}
+            {{ f.render_form_field(form.phone) }}
+
+
+            {{ f.form_message(flashes['error'], header='Something went wrong.', class='error') }}
+            {{ f.form_message(flashes['warning'], header='Check your email.', class='warning') }}
+            {{ f.form_message(flashes['info'], header='Information', class='info') }}
+            {{ f.form_message(flashes['success'], header='Success!', class='success') }}
+
+            {% for field in form | selectattr('type', 'equalto', 'SubmitField') %}
+                {{ f.render_form_field(field) }}
+            {% endfor %}
+
+            {{ f.end_form(form) }}
+        </div>
+    </div>
+
+
+
+    <script>
+    $("#add_edit").change(function() {
+        var supplier_id = $("#add_edit").find(":selected").val();
+        if (supplier_id != 0) {
+            window.location.replace('/admin/add-supplier/' + supplier_id);
+        }
+      });
+    $("#add_edit").change(function() {
+        var supplier_id = $("#add_edit").find(":selected").val();
+        if (supplier_id == 0) {
+            window.location.replace('/admin/add-supplier');
+        }
+      });
+      </script>
+{% endblock %}

@@ -1,0 +1,232 @@
+{% extends 'layouts/base.html' %}
+{% import 'macros/form_macros.html' as f %}
+
+{% block content %}
+
+
+{% set flashes = {
+    'error':   get_flashed_messages(category_filter=['form-error']),
+    'success': get_flashed_messages(category_filter=['form-success'])
+} %}
+
+{{ f.begin_form(form, flashes) }}
+{{ f.end_form() }}
+
+
+
+
+<form action='' method="POST">
+
+    <div class="ui very relaxed stackable grid container">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <div class="sixteen wide tablet twelve wide computer centered column">
+            <a class="ui basic compact button" href="{{ url_for('plants.water') }}">
+                <i class="caret left icon"></i>
+                Back to calendar
+            </a>
+            <h2 class="ui header">
+                Watering
+                <div class="sub header">
+                </div>
+            </h2>
+            {{ f.form_message(flashes['error'], header='Error', class='error') }}
+            {{ f.form_message(flashes['success'], header='Success!', class='success') }}
+            <div class="ui menu">
+                <div id="select-family" class="ui dropdown item">
+                    <div class="text">
+                        All families
+                    </div>
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                        <div class="item" data-value="">All Families</div>
+                        {% for f in families %}
+                            <div class="item" data-value="{{ f.name }}">{{ f.name }}s</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="ui right search item">
+                    <div class="ui transparent icon input">
+                        <input id="search-users" type="text" placeholder="Search…">
+                        <i class="search icon"></i>
+                    </div>
+                </div>
+            </div>
+
+            {# Use overflow-x: scroll so that mobile views don't freak out
+             # when the table is too wide #}
+            <div style="overflow-x: scroll;">
+                <table class="ui searchable sortable unstackable selectable celled table">
+                    <thead>
+                        <tr>
+                            <th>Add</th>
+                            <th>SKU</th>
+                            <th class="sorted ascending">Family</th>
+                            <th>Species</th>
+                            <th>Last watered</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {# for p in plants | sort(attribute='sku') #}
+                    {% for p in plants %}
+                        <tr id="{{p.sku}}-row">
+                            <td class="collapsing">
+                                <div class="ui checkbox">
+                                    <input type="checkbox" id="check_{{p.sku}}" name="{{p.sku}}"/>
+                                    <label></label>
+                                </div>
+                            </td>
+                            <td class="collapsing">{{ p.sku }}</td>
+                            <td class="family">{{ p.familyName() }}</td>
+                            <td>{{ p.shortName() }}</td>
+                            <td>{{ p.lastWater() }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="sixteen wide tablet twelve wide computer centered column">
+            <div class="ui center aligned segment">
+                <div class="ui labeled button" id="waterDiv" tabindex="0">
+                    <div class="ui button" id="waterButton">
+                      <i class="tint icon"></i> Water
+                    </div>
+                    <a class="ui basic label">
+                        <div class="ui checkbox">
+                            <input type="checkbox" name="water" id="waterCheck"/>
+                            <label></label>
+                        </div>
+                    </a>
+                </div>
+                <div class="ui labeled button" id="feedDiv" tabindex="0">
+                    <div class="ui button" id="feedButton">
+                      <i class="flask icon"></i> Fertilized
+                    </div>
+                    <a class="ui basic label">
+                        <div class="ui checkbox">
+                            <input type="checkbox" name="feed" id="feedCheck"/>
+                            <label></label>
+                        </div>
+                    </a>
+                </div>
+                <br>
+                <h4 class="ui horizontal divider header">Notes</h4>
+                <div class="column"><textarea id="notes" name="notes" style="min-width:300px" cols="50" rows="6"></textarea></div>
+                <input class="ui button" id="submit" name="submit" type="submit"  value="Submit">
+            </div>
+        </div>
+    </div>
+</form>
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#search-plants').keyup(function () {
+                var searchText = $(this).val();
+                if (searchText.length > 0) {
+                    $('tbody td:icontains(' + searchText + ')').addClass('positive');
+                    $('td.positive').not(':icontains(' + searchText + ')').removeClass('positive');
+                    $('tbody td').not(':icontains(' + searchText + ')').closest('tr').addClass('hidden').hide();
+                    $('tr.hidden:icontains(' + searchText + ')').removeClass('hidden').show();
+                } else {
+                    $('td.positive').removeClass('positive');
+                    $('tr.hidden').removeClass('hidden').show();
+                }
+            });
+
+            $.fn.selex = function(x) {
+                alert("It's happening!");
+                var chkBox = $(x).find("input");
+                if(chkBox.is(':checked')) {
+                    $(chkBox).prop('checked', false);
+                } else{
+                    $(chkBox).prop('checked', true);
+                }
+            }
+
+            $('#select-family').dropdown({
+                onChange: function (value, text, $selectedItem) {
+                    $('td.family:contains(' + value + ')').closest('tr').removeClass('hidden').show();
+                    $('td.family').not(':contains(' + value + ')').closest('tr').addClass('hidden').hide();
+                }
+            });
+
+            $("[id^=check]").click(function(){
+                if($(this).is(':checked')) {
+                    $(this).prop('checked', false);
+                    $(this).parent().removeClass("active")
+                } else{
+                    $(this).prop('checked', true);
+                    $(this).parent().addClass("active")
+                }
+            });
+
+            $("[id$=row]").click(function(){
+                var selectedRow = $( this ).find("input");
+                if(selectedRow.is(':checked')) {
+                    $(selectedRow).prop('checked', false);
+                    $(this).removeClass("active")
+                } else{
+                    $(selectedRow).prop('checked', true);
+                    $(this).addClass("active")
+                }
+            });
+
+            $('#waterDiv').click(function() {
+                if($('#waterCheck').is(':checked')) {
+                    $('#waterButton').removeClass("ui blue button")
+                    $('#waterButton').addClass("ui button")
+                    $('#waterCheck').prop('checked', false);
+                }
+                else{
+                    $('#waterButton').removeClass("ui button")
+                    $('#waterButton').addClass("ui blue button")
+                    $('#waterCheck').prop('checked', true);
+                }
+            });
+
+            $('#waterCheck').click(function(){
+                if($(this).is(':checked')) {
+                    $('#waterButton').removeClass("ui blue button")
+                    $('#waterButton').addClass("ui button")
+                    $(this).prop('checked', false);
+                }
+                else{
+                    $('#waterButton').removeClass("ui button")
+                    $('#waterButton').addClass("ui blue button")
+                    $(this).prop('checked', true);
+                }
+
+            });
+
+            $('#feedDiv').click(function() {
+                if($('#feedCheck').is(':checked')) {
+                    $('#feedButton').removeClass("ui green button")
+                    $('#feedButton').addClass("ui button")
+                    $('#feedCheck').prop('checked', false);
+                }
+                else{
+                    $('#feedButton').removeClass("ui button")
+                    $('#feedButton').addClass("ui green button")
+                    $('#feedCheck').prop('checked', true);
+                }
+            });
+            $('#feedCheck').click(function(){
+                if($(this).is(':checked')) {
+                    $('#feedButton').removeClass("ui green button")
+                    $('#feedButton').addClass("ui button")
+                    $(this).prop('checked', false);
+                }
+                else{
+                    $('#feedButton').removeClass("ui button")
+                    $('#feedButton').addClass("ui green button")
+                    $(this).prop('checked', true);
+                }
+
+            });
+        });
+    </script>
+{% endblock %}
+
+{# 
+#}

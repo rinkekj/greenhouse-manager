@@ -1,0 +1,135 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<div class="ui sixteen wide tablet twelve wide computer grid">
+    <div class="row">
+        <div class="two wide column"></div>
+            <div class="twelve wide left aligned column">        
+                <a class="ui basic compact button" href="{{ url_for('main.index') }}">
+                    <i class="caret left icon"></i>
+                    Back
+                </a>
+            </div>
+    </div>
+
+
+    <div class="row">
+        <div class="two wide column"></div>
+        <div class="five wide left aligned column">
+            <h2 class="ui left floated header">
+                Inventory
+                <div class="sub header">
+                    View and manage inventory.
+                </div>
+            </h2>
+        </div>
+        <div class="nine wide column">
+            <div class="ui buttons">
+                <button class="ui positive button">All</button>
+                <div class="or"></div>
+                <button class="ui left attached button">
+                    <a href="{{ url_for('plants.inventory') }}">
+                        <h5 class="ui grey header">Plants</h5>
+                    </a></button>
+                <button class="ui right attached button">
+                    <a href="{{ url_for('main.inventory_item') }}">
+                        <h5 class="ui grey header">Supplies</h5>
+                    </a></button>
+            </div>
+        </div>
+            
+    </div>
+
+
+
+
+    <div class="row">
+        <div class="twelve wide centered column">
+            <div class="ui menu">
+                <div id="select-type" class="ui dropdown item">
+                    <div class="text">
+                        All items
+                    </div>
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                        <div class="item" data-value="">All items</div>
+                        {% for t in types %}
+                            <div class="item" data-value="{{ t }}">{{ t }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="ui right search item">
+                    <div class="ui transparent icon input">
+                        <input id="search-items" type="text" placeholder="Search inventory...">
+                        <i class="search icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="twelve wide centered column">
+        {# Use overflow-x: scroll so that mobile views don't freak out
+         # when the table is too wide #}
+        <div class=plantTable style="overflow-x: scroll;">
+            <table class="ui searchable sortable unstackable selectable celled table" >
+              <thead>
+                <tr>
+                  <th class="center aligned">Category</th>
+                  <th class="sorted ascending center aligned">SKU</th>
+                  <th>Description</th>
+                  <th>Supplier</th>
+                  <th class="center aligned">Location</th>
+                  <th class="center aligned">Quantity</th>
+                  <th class="center aligned">Price</th>
+                </tr>
+              </thead>
+              <tbody>
+               {% for i in items | sort(attribute='name') %}
+
+                 {% if i.quantity == 0 %}
+                   <tr class="disabled">
+                 {% else %}
+                   <tr>
+                 {% endif %}
+
+                  <td class="type">{{ i.type }}</td>
+                  <td class="center aligned">{{ i.sku }}</td>
+                  <td>{{ i.name }}</td>
+                  <td>
+                      <a href="{{ url_for('main.vcard', supID=i.supplierID) }}">
+                      <i class="address card icon"></i>
+                      {{ i.supplier }} </a></td>
+                  <td class="center aligned">{{ i.location }}</td>
+                  <td class="right aligned">{{ i.quantity }}</td>
+                  <td class="left aligned">${{ i.price }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#search-items').keyup(function () {
+                var searchText = $(this).val();
+                if (searchText.length > 0) {
+                    $('tbody td:icontains(' + searchText + ')').addClass('positive');
+                    $('td.positive').not(':icontains(' + searchText + ')').removeClass('positive');
+                    $('tbody td').not(':icontains(' + searchText + ')').closest('tr').addClass('hidden').hide();
+                    $('tr.hidden:icontains(' + searchText + ')').removeClass('hidden').show();
+                } else {
+                    $('td.positive').removeClass('positive');
+                    $('tr.hidden').removeClass('hidden').show();
+                }
+            });
+
+            $('#select-type').dropdown({
+                onChange: function (value, text, $selectedItem) {
+                    $('td.type:contains(' + value + ')').closest('tr').removeClass('hidden').show();
+                    $('td.type').not(':contains(' + value + ')').closest('tr').addClass('hidden').hide();
+                }
+            });
+        });
+    </script>
+{% endblock %}

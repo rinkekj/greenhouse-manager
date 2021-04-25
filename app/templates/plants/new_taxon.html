@@ -1,0 +1,148 @@
+{% extends 'layouts/base.html' %}
+{% import 'macros/form_macros.html' as f %}
+
+{% block content %}
+    <div class="ui stackable centered grid container">
+        <div class="twelve wide column">
+            
+            <h2 class="ui header">
+                {{ title }}
+                <div class="sub header"> {{ sub }} </div>
+            </h2>
+
+            {% set flashes = {
+                'error':   get_flashed_messages(category_filter=['form-error']),
+                'success': get_flashed_messages(category_filter=['form-success'])
+            } %}
+
+            {{ f.begin_form(form, flashes) }}
+
+              {% for field in form | selectattr('name', '!=', 'csrf_token')%}  
+                <div class="ui four column grid">
+                  <div class="column">
+                    {{ field.label.text }}
+                  </div>
+                  <div class="column">
+                    {{ field }}
+                  </div>
+                </div>
+              {% endfor %}
+
+                <div class="ui four column grid">
+                  <div class="column"></div>
+                  <div class="column">
+                    <input type="submit" name="submit_button" value="Submit">
+                  </div>
+                </div>
+                {{ f.form_message(flashes['error'], header='Duplicate Entry', class='error') }}
+                {{ f.form_message(flashes['success'], header='Success!', class='success') }}
+
+                {% for field in form | selectattr('type', 'equalto', 'SubmitField') %}
+                    {{ f.render_form_field(field) }}
+                {% endfor %}
+
+            {{ f.end_form() }}
+        </div>
+    </div>
+
+<script>
+$("#family_select").change(function() {
+  console.log("were in")
+  var family_id = $("#family_select").find(":selected").val();
+  var request = $.ajax({
+    type: 'GET',
+    contentType: "application/json; charset-utf-8",
+    dataType: "json",
+    url: '/plants/_get_genera/' + family_id,
+    done: function(results) {
+      JSON.parse(results);
+      return results;
+    },
+  });
+  request.done(function(data) {
+    $("#genus_select").empty();
+    $("#genus_select").append(
+      $("<option></option>").attr(
+        "value", '0').text('--- Select ---'))
+    $("#species_select").empty();
+    $("#species_select").append(
+      $("<option></option>").attr(
+        "value", '0').text('------'))
+    for (var key in data) {
+      if (data.hasOwnProperty(key)) {
+        console.log(key + " -> " + data[key]);
+        $("#genus_select").append(
+          $("<option></option>").attr(
+            "value", key).text(data[key]))
+      }
+    }
+  });
+});
+
+
+$("#genus_select").change(function() {
+  var genus_id = $("#genus_select").find(":selected").val();
+  if (genus_id != 0) {
+
+
+    var request = $.ajax({
+      type: 'GET',
+      contentType: "application/json; charset-utf-8",
+      dataType: "json",
+      url: '/plants/_get_species/' + genus_id,
+      done: function(results) {
+        JSON.parse(results);
+        return results;
+      },
+    });
+    request.done(function(data) {
+      $("#species_select").empty();
+      $("#species_select").append(
+        $("<option></option>").attr(
+          "value", '0').text('--- Select ---'))
+
+      for (var key in data) {
+        if (data.hasOwnProperty(key)) {
+          console.log(key + " -> " + data[key]);
+          $("#species_select").append(
+            $("<option></option>").attr(
+              "value", key).text(data[key]))
+        }
+      }
+    });
+  }
+});
+
+$("#species_select").change(function() {
+  var species_id = $("#species_select").find(":selected").val();
+  if (species_id != 0) {
+    var request = $.ajax({
+      type: 'GET',
+      contentType: "application/json; charset-utf-8",
+      dataType: "json",
+      url: '/plants/_get_varieties/' + species_id,
+      done: function(results) {
+        JSON.parse(results);
+        return results;
+      },
+    });
+    request.done(function(data) {
+      $("#variety_select").empty();
+      $("#variety_select").append(
+        $("<option></option>").attr(
+          "value", '0').text('--- Select ---'))
+
+      for (var key in data) {
+        if (data.hasOwnProperty(key)) {
+          console.log(key + " -> " + data[key]);
+          $("#variety_select").append(
+            $("<option></option>").attr(
+              "value", key).text(data[key]))
+        }
+      }
+    });
+  }
+});
+</script>
+
+{% endblock %}

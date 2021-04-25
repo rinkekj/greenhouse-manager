@@ -1,0 +1,120 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+    <div class="ui stackable grid container">
+        <div class="sixteen wide tablet twelve wide computer centered column">
+            <h2 class="ui header">
+                Checkout
+                <div class="sub header">
+                    Select items to add to cart
+                </div>
+            </h2>
+
+            <div class="ui menu">
+                <div id="select-type" class="ui dropdown item">
+                    <div class="text">
+                        All items
+                    </div>
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                        <div class="item" data-value="">All items</div>
+                        {% for t in types %}
+                            <div class="item" data-value="{{ t }}">{{ t }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="ui right search item">
+                    <div class="ui transparent icon input">
+                        <input id="search-items" type="text" placeholder="Search species…">
+                        <i class="search icon"></i>
+                    </div>
+                </div>
+            </div>
+
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+                .planttable {
+                    font-family: 'IBM Plex Mono', monospace;
+                }
+            </style>     
+
+            {# Use overflow-x: scroll so that mobile views don't freak out
+             # when the table is too wide #}
+            <div class=planttable style="overflow-x: scroll;">
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <table class="ui searchable sortable unstackable selectable celled table" >
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>SKU</th>
+                            <th class="sorted ascending">Description</th>
+                            <th>Stock</th>
+                            <th>Price</th>
+                            <th>Purchase</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                    {% for i in items %} {# | sort(attribute='name') #}
+                        <tr id="row_{{ i.sku }}" class="">
+                            <td class="type">{{ i.type }}</td>
+                            <td>{{ i.sku }}</td>
+                            <td>{{ i.name }}</td>
+                            <td class="right aligned">{{ i.quantity }}</td>
+                            <td>${{ i.price }}</td>
+                            <td class="collapsing" id="">
+                                <div class="ui checkbox">
+                                    <input type="checkbox" id="check_{{i.sku}}"/>
+                                    <label></label>
+                                </div>
+                                <div class="ui disabled input" id="qty_{{i.sku}}">
+                                    <input type="number" name='{{i.sku}}' value=''/>
+                                    <label></label>
+                                </div>
+                            </td>
+                        </tr>
+                    
+
+                        <script>
+                            $('#check_{{i.sku}}').click(function() {
+                                $('#row_{{i.sku}}').toggleClass('positive', $('#check_{{i.sku}}').prop("checked") == true);
+                                $('#qty_{{i.sku}}').toggleClass('disabled', $('#check_{{i.sku}}').prop("checked") == false);
+                            });
+                        </script>
+                        
+
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <input type="submit" value="Submit">
+                </form>
+            </div>
+            
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#search-items').keyup(function () {
+                var searchText = $(this).val();
+                if (searchText.length > 0) {
+                    $('tbody td:icontains(' + searchText + ')').addClass('positive');
+                    $('td.positive').not(':icontains(' + searchText + ')').removeClass('positive');
+                    $('tbody td').not(':icontains(' + searchText + ')').closest('tr').addClass('hidden').hide();
+                    $('tr.hidden:icontains(' + searchText + ')').removeClass('hidden').show();
+                } else {
+                    $('td.positive').removeClass('positive');
+                    $('tr.hidden').removeClass('hidden').show();
+                }
+            });
+
+            $('#select-type').dropdown({
+                onChange: function (value, text, $selectedItem) {
+                    $('td.type:contains(' + value + ')').closest('tr').removeClass('hidden').show();
+                    $('td.type').not(':contains(' + value + ')').closest('tr').addClass('hidden').hide();
+                }
+            });
+        });
+    </script>
+{% endblock %}

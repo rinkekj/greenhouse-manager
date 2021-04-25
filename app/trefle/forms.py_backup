@@ -1,0 +1,202 @@
+from flask_wtf import FlaskForm
+from wtforms import Form, ValidationError
+from wtforms.fields import BooleanField, TextField, StringField, RadioField, SelectField, IntegerField, FloatField, SelectMultipleField
+import wtforms_json
+
+wtforms_json.init()
+
+class NoteForm(Form):
+    notes: TextField()
+
+class SourceTypeForm(Form):
+    source_type: RadioField(choices=['external','internal'])
+
+class SourceReferenceForm(Form):
+    source_reference: StringField()
+
+class ScientificNameForm(Form):
+    scientific_name: StringField()
+
+class RankForm(Form):
+    rank: SelectField(choices=['species', 'ssp', 'var', 'form', 'hybrid', 'subvar'])
+
+class GenusForm(Form):
+    genus: StringField()
+
+class YearForm(Form):
+    year: IntegerField()
+
+class AuthorForm(Form):
+    author: StringField()
+
+class BibliographyForm(Form):
+    bibliography: StringField()
+
+class CommonNameForm(Form):
+    # Several values can be separated with "|"
+    common_name: StringField()
+
+class ObservationsForm(Form):
+    observations: StringField()
+
+class PlantingDescriptionForm(Form):
+    planting_description: StringField()
+
+class SowingDescriptionForm(Form):
+    planting_sowing_description: StringField()
+
+class DurationForm(Form):
+    duration: SelectField(choices=['annual','biennial','perennial', ''])
+
+class FlowerColorForm(Form):
+    flower_color: SelectField(choices=['white', 'red', 'brown', 'orange', 'yellow', 'lime', 'green', 'cyan', 'blue', 'purple', 'magenta', 'grey', 'black', ''])
+
+class FlowerConspicuousForm(Form):
+      flower_conspicuous: BooleanField()
+
+class FoliageColorForm(Form):
+    # Several values can be separated with "|"
+    foliage_color: SelectMultipleField(choices=['white', 'red', 'brown', 'orange', 'yellow', 'lime', 'green', 'cyan', 'blue', 'purple', 'magenta', 'grey', 'black', ''])
+
+class FoliageTextureForm(Form):
+    foliage_texture: SelectField(choices=['fine', 'medium','coarse', ''])
+
+class LeafRetentionForm(Form):
+    leaf_retention: BooleanField()
+
+class FruitColorForm(Form):
+     fruit_color: SelectMultipleField(choices=['white', 'red', 'brown', 'orange', 'yellow', 'lime', 'green', 'cyan', 'blue', 'purple', 'magenta', 'grey', 'black', ''])
+
+class FruitConspicuousForm(Form):
+    fruit_conspicuous: BooleanField()
+
+class FruitSeedPersistenceForm(Form):
+    fruit_seed_persistence: BooleanField()
+
+class FruitMonthsForm(Form):
+    # Several values can be separated with "|"
+    fruit_months: SelectMultipleField(choices=['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov','dec'])
+
+class BloomMonthsForm(Form):
+    # Several values can be separated with "|"
+    bloom_months: SelectMultipleField(choices=['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov','dec'])
+
+class GroundHumidityForm(Form):
+    # 0 (xerophile) to 10 (subaquatic)
+    ground_humidity: IntegerField()
+
+class GrowthFormForm(Form):
+    growth_form: StringField()
+
+class GrowthHabitForm(Form):
+    growth_habit: StringField()
+
+class GrowthMonthsForm(Form):
+    # Several values can be separated with "|"
+    growth_months: SelectMultipleField(choices=['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov','dec'])
+
+class GrowthRateForm(Form):
+    growth_rate: StringField()
+
+class EdiblePartForm(Form):
+    edible_part: SelectMultipleField(choices=['roots', 'stem', 'leaves', 'flowers', 'fruits', 'seeds'])
+
+class VegetableForm(Form):
+    vegetable: BooleanField()
+
+class LightForm(Form):
+    # scale from 0 (no light, <= 10 lux) to 10 (very intensive insolation, >= 100 000 lux)
+    light: IntegerField()
+
+class AtmosphericHumidityForm(Form):
+    atmospheric_humidity: IntegerField()
+
+class AdaptedToCourseSoilsForm(Form):
+    adapted_to_coarse_textured_soils: BooleanField()
+
+class AdaptedToFineSoilsForm(Form):
+    adapted_to_fine_textured_soils: BooleanField()
+
+class AdaptedToMediumSoilsForm(Form):
+    adapted_to_medium_textured_soils: BooleanField()
+
+class AnaerobicToleranceForm(Form):
+    anaerobic_tolerance: BooleanField()
+
+class AverageHeightUnitForm(Form):
+   average_height_unit: SelectField(choices=['in', 'ft', 'cm', 'm'])
+
+class AverageHeightValueForm(Form):
+    average_height_value: FloatField()
+
+class MaximumHeightUnitForm(Form):
+    maximum_height_unit: SelectField(choices=['in', 'ft', 'cm', 'm'])
+
+class MaximumHeightValueForm(Form):
+    maximum_height_value: FloatField()
+
+class PlantingRowSpacingUnitForm(Form):
+    planting_row_spacing_unit: SelectField(choices=['in', 'ft', 'cm', 'm'])
+
+class PlantingRowSpacingValueForm(Form):
+    planting_row_spacing_value: FloatField()
+
+class PlantingSpreadUnitForm(Form):
+    planting_spread_unit: SelectField(choices=['in', 'ft', 'cm', 'm'])
+
+class PlantingSpreadValueForm(Form):
+    planting_spread_value: FloatField()
+
+class PlantingDaysToHarvestForm(Form):
+    planting_days_to_harvest: IntegerField()
+
+class MaximumPrecipitationUnitForm(Form):
+    maximum_precipitation_unit: SelectField(choices=['in', 'ft', 'mm', 'cm', 'm'])
+
+class MaximumPrecipitationValueForm(Form):
+    maximum_precipitation_value: IntegerField()
+
+class MinimumPrecipitationUnitForm(Form):
+    minimum_precipitation_unit: SelectField(choices=['in', 'ft', 'mm', 'cm', 'm'])
+
+class MinimumPrecipitationValueForm(Form):
+    minimum_precipitation_value: IntegerField()
+
+class MinimumRootDepthUnitForm(Form):
+    minimum_root_depth_unit: SelectField(choices=['in', 'ft', 'mm', 'cm', 'm'])
+
+class MinimumRootDepthValueForm(Form):
+    minimum_root_depth_value: IntegerField()
+
+class PhMaximumForm(Form):
+    ph_maximum: FloatField()
+
+class PhMinimumForm(Form):
+    ph_minimum: FloatField()
+
+class SoilNutrientsForm(Form):
+    # Required quantity of nutriments in the soil, on a scale from 0 (oligotrophic) to 10 (hypereutrophic)
+    soil_nutriments: IntegerField()
+
+class SoilSalinityForm(Form):
+    # Tolerance to salinity, on a scale from 0 (untolerant) to 10 (hyperhaline)
+    soil_salinity: IntegerField()
+
+class MinimumTemperatureForm(Form):
+    # Degrees celcius
+    minimum_temperature_deg_c: IntegerField()
+
+class MaximumTemperatureForm(Form):
+    # Degrees celcius
+    maximum_temperature_deg_c: IntegerField()
+
+class SoilTextureForm(Form):
+    # Required texture of the soil, on a scale from 0 (clay) to 10 (rock) 
+    soil_texture: IntegerField()
+
+class LigneousTypeForm(Form):
+    ligneous_type: SelectField(choices=['liana', 'subshrub', 'shrub', 'tree', 'parasite'])
+
+class ToxicityForm(Form):
+    toxicity: SelectField(choices=['none', 'low', 'medium', 'high'])
+

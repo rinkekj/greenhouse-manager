@@ -1,0 +1,44 @@
+{% extends 'layouts/base.html' %}
+{% import 'macros/form_macros.html' as f %}
+
+{% macro dashboard_option(title, endpoint, description=None, icon=None) %}
+    <a class="column" href="{{ url_for(endpoint) }}">
+        <div class="ui padded segment">
+            <h3 class="ui header">
+                {% if icon is not none %}
+                    <i class="{{ icon }}"></i>
+                {% endif %}
+                <div class="content">
+                    {{ title }}
+                    {% if description is not none %}
+                        <div class="sub header">
+                            {{ description }}
+                        </div>
+                    {% endif %}
+                </div>
+            </h3>
+        </div>
+    </a>
+{% endmacro %}
+
+{% block content %}
+    <div class="ui grid container">
+        <div class="eight wide computer sixteen wide mobile centered column">
+            <h2 class="ui dividing header">Checkout</h2>
+
+                <div class="ui one column grid">
+                    <div class="center aligned column">
+
+                        {{ dashboard_option('Returning Customer', 'main.customers',
+                                    description='', icon='user circle icon') }}
+
+                        {{ dashboard_option('New Customer', 'register.registration',
+                                    description='', icon='user circle outline icon') }}
+
+                        {{ dashboard_option('Continue to Checkout', 'main.checkout',
+                                    description='', icon='barcode icon') }}
+                    </div>
+                </div>
+        </div>
+    </div>
+{% endblock %}

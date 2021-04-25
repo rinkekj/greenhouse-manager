@@ -1,0 +1,103 @@
+{% extends 'layouts/base.html' %}
+
+{% macro dashboard_option(title, endpoint, description=None, icon=None) %}
+    <a class="column" href="{{ url_for(endpoint) }}">
+        <div class="ui padded segment">
+            <h3 class="ui header">
+                {% if icon is not none %}
+                    <i class="{{ icon }}"></i>
+                {% endif %}
+                <div class="content">
+                    {{ title }}
+                    {% if description is not none %}
+                        <div class="sub header">
+                            {{ description }}
+                        </div>
+                    {% endif %}
+                </div>
+            </h3>
+        </div>
+    </a>
+{% endmacro %}
+
+{% macro dashboard_static(title, endpoint, description=None, pic=None) %}
+    <a class="column" href="{{ url_for(endpoint) }}">
+        <div class="ui padded segment">
+            <h3 class="ui header">
+                {% if icon is not none %}
+                <img class="ui small image" src="/static/images/{{ pic }}">
+                {% endif %}
+                <div class="content">
+                    {{ title }}
+                    {% if description is not none %}
+                        <div class="sub header">
+                            {{ description }}
+                        </div>
+                    {% endif %}
+                </div>
+            </h3>
+        </div>
+    </a>
+{% endmacro %}
+
+
+{% block content %}
+    <div class="ui stackable centered grid container">
+        <div class="twelve wide column">
+            <h2 class="ui header">
+                Admin Dashboard
+            </h2>
+                <div class="ui two column stackable grid">
+                    <div class="column">
+                <div class="ui raised segment">
+                    <h5 class="ui horizontal header divider">
+                        <i class="archive icon"></i>
+                        Inventory
+                    </h5>
+                    {{ dashboard_option('Inventory', 'main.inventory',
+                                description='View and manage inventory', icon='tasks icon') }}
+                    {{ dashboard_option('Plant Check-in', 'plants.new_plant',
+                                description='Add plant inventory items', icon='clipboard outline icon') }}
+                    {{ dashboard_option('Supplies Check-in', 'main.supplier_list',
+                                description='Add general merchandise to inventory', icon='clipboard outline icon') }}
+                    {{ dashboard_option('Plants', 'admin.new_user',
+                                description='View and edit plant inventory', icon='leaf icon') }}
+                    </div>
+                </div>
+                <div class="column">
+                <div class="ui raised segment">
+                        <h5 class="ui horizontal header divider">
+                            <i class="leaf icon"></i>
+                            PlantDB
+                        </h5>
+                    {{ dashboard_static('Import species', 'plants.search',
+                                description='Search for new species using trefle.io', pic='trefle-logo.svg') }}
+                    {{ dashboard_option('Add Species', 'plants.add_species',
+                                description='Manually enter new species', icon='edit outline icon') }}
+                    {{ dashboard_option('Add Cultivar', 'plants.add_variety',
+                                description='Manually enter new species variety', icon='edit outline icon') }}
+                    {{ dashboard_option('Watering', 'plants.water',
+                                description='View watering schedule', icon='tint icon') }}
+                </div>
+                </div>
+
+                <div class="column">
+                    <div class="ui raised segment">
+                            <h5 class="ui horizontal header divider">
+                                <i class="users icon"></i>
+                                People
+                            </h5>
+                    {{ dashboard_option('Employees', 'admin.registered_users',
+                        description='View and manage employees', icon='id badge icon') }}
+                    {{ dashboard_option('New Account', 'admin.new_user',
+                        description='Create a new user account', icon='add user icon') }}
+                    {{ dashboard_option('Suppliers', 'main.supplier_list',
+                        description='View and edit suppliers', icon='truck icon') }}
+                    {{ dashboard_option('Customers', 'admin.customers',
+                        description='View and edit taxonomic information', icon='male icon') }}
+                    </div>
+                    </div>
+
+        </div>
+    </div>
+{% endblock %}

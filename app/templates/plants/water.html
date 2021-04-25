@@ -1,0 +1,142 @@
+
+{% extends 'layouts/base.html' %}
+{% block custom_head_tags %}
+  <style>
+  table
+  {
+    border-collapse:collapse;
+    width:20%;
+    color:black;
+  }
+  td
+  {
+    min-width: 2em;
+    height:2em;
+  }
+  #th2
+  {
+    min-width: 2em;
+    border-bottom:1px solid black;
+  }
+  td[id*="n"]
+  {
+    min-width: 2em;
+    border-collapse: separate;
+    border:2px solid black;
+  }
+  td[id*="b7"]
+  {
+    min-width: 2em;
+    background-color:#00bfff;
+    border-bottom:1px solid black;
+  }
+  td[id*="b6"]
+  {
+    min-width: 2em;
+    background-color:#1ac6ff;
+    border-bottom:1px solid black;
+  }
+  td[id*="b5"]
+  {
+    min-width: 2em;
+    background-color:#33ccff;
+    border-bottom:1px solid black;
+  }
+  td[id*="b4"]
+  {
+    min-width: 2em;
+    background-color:#66d9ff;
+    border-bottom:1px solid black;
+  }
+  td[id*="b3"]
+  {
+    min-width: 2em;
+    background-color:#99e6ff;
+    border-bottom:1px solid black;
+  }
+  td[id*="b2"]
+  {
+    min-width: 2em;
+    background-color:#ccf2ff;
+    border-bottom:1px solid black;
+  }
+  td[id*="b1"]
+  {
+    min-width: 2em;
+    background-color:#ccf2ff;
+    border-bottom:1px solid black;
+  }
+  td[id*="b0"]
+  {
+    min-width: 2em;
+    background-color:white;
+    border-bottom:1px solid black;
+  }
+
+  </style>
+{% endblock %}
+
+
+{% block content %}
+<div class="ui very relaxed stackable grid container">
+  <div class="sixteen wide tablet twelve wide computer centered column">
+   <div class="row"> 
+    <h2 class="ui header">
+        Watering calendar
+        <div class="sub header">
+        </div>
+    </h2></div>
+    <div class="row">
+    <a class="ui basic compact button" href="{{ url_for('plants.massWater') }}">
+      <i class="plus icon"></i>
+      Add
+  </a></div>
+<div style="overflow-x:auto;">
+
+  <table style="width:100%">
+    <tr>
+      <th style="width:10%; border-style:none"></th>
+      <th style="width:40%; border-left:0px"></th>
+    {% if date.day < 15 %}
+      <th colspan="{{15-date.day}}" style="text-align:left; border-left:1px solid"> {{ startDate.strftime("%B") }}</th>
+      <th colspan="{{ date.day }}" style="text-align:left; border-left:1px solid"> {{ date.strftime("%B") }}</th>
+    {% else %}
+      <th colspan="15" style="text-align:left"></th>
+    {% endif %}
+    </tr>
+    <tr>
+      <td id=th2>SKU</td>
+      <td id=th2>Species</td>
+    {% for item in row2%}
+      {% if loop.first %}
+      <th id=th2 style="border-left:1px solid">{{item}}</th>
+      {% elif item == 1 %}
+      <th id=th2 style="border-left:1px solid">{{item}}</th>
+      {% else %}
+      <th id=th2>{{item}}</th>
+      {% endif %}
+    {% endfor %}
+
+    </tr>
+{% for c in calendar %}
+    <tr>
+      <td>{{c}}</td>
+      <td style="border-right:1px solid"><i>{{shortName[c].shortName()}}</i></td>
+  {% for d in calendar[c] %}
+    <td id=
+    {% if d[0] is sameas true %}
+      n{{d[1]}}><a href="/plants/log/{{c}}"><div style="height:100%;width:100%"></div></a></td>
+    {% elif loop.first %}
+       {{d[1]}}></td>  
+    {% else %}
+       {{d[1]}}></td>
+    {% endif %}
+  {% endfor %}
+    </tr>
+{% endfor %}
+
+  </table>
+</div>
+</div>
+</div>
+  {% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<div class="ui container">
+  <div class=planttable style="overflow-x: scroll;">
+    <table class="ui searchable sortable unstackable selectable celled table" >
+
+      <thead>
+        <tr>
+          <th class="center aligned collapsing">SKU</th>
+          <th>Species</th>
+          <th>Supplier</th>
+          <th class="collapsing">Size</th>
+          <th class="collapsing">Price</th>
+          <th class="collapsing">Date received</th>
+          <th class="collapsing">Qty.</th>
+        </tr>
+
+      </thead>
+      <tbody>
+          {% for i in table.items %}
+          <tr>
+              <td class="center aligned collapsing"><a class="fluid ui basic button" href="{{'/plants/edit/{}'.format(i.sku)}}">
+                {{ i.sku }}
+                </a> </td>
+              <td><a href="{{'/plants/log/{}'.format(i.sku)}}">{{ i.fullName}}</a></td>
+              <td class="left aligned collapsing"><a href="{{url_for('main.index')}}">  {{ i.supplier}} <i class="address card icon" ></i></a></td>
+              <td class="collapsing"> {{ i.size}} in. </td>
+              <td class="left aligned collapsing"> ${{ i.price}} </td>
+              <td class="collapsing"> {{ i.date_received }} </td>
+              <td class="right aligned collapsing"> {{ i.quantity }} </td>
+            </tr>
+          {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

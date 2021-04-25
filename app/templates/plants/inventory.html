@@ -1,0 +1,143 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+    <div class="ui sixteen wide tablet twelve wide computer grid">
+        <div class="row">
+            <div class="two wide column"></div>
+                <div class="twelve wide left aligned column">        
+                    <a class="ui basic compact button" href="{{ url_for('plants.search') }}">
+                        <i class="plus icon"></i>
+                        Import species
+                    </a>
+                </div>
+        </div>
+
+
+        <div class="row">
+            <div class="two wide column"></div>
+            <div class="four wide left aligned column">
+                <h2 class="ui left floated header">
+                    Plant Inventory
+                    <div class="sub header">
+                        View and manage plant inventory.
+                    </div>
+                </h2>
+            </div>
+            <div class="four wide column">
+                <div class="ui buttons">
+                    <button class="ui button">
+                        <a href="{{ url_for('main.inventory') }}">
+                            <h5 class="ui grey header">All</h5>
+                        </a>
+                    </button>
+                    <div class="or"></div>
+                    <button class="ui left attached positive button">Plants</button>
+                    <button class="ui right attached button">
+                        <a href="{{ url_for('main.inventory_item') }}">
+                            <h5 class="ui grey header">Supplies</h5>
+                        </a></button>
+                </div>
+            </div>
+                
+        </div>
+
+
+
+
+        <div class="row">
+            <div class="twelve wide centered column">
+                <div class="ui menu">
+                    <div id="select-family" class="ui dropdown item">
+                        <div class="text">
+                            All families
+                        </div>
+                        <i class="dropdown icon"></i>
+                        <div class="menu">
+                            <div class="item" data-value="">All Families</div>
+                            {% for f in families %}
+                                <div class="item" data-value="{{ f.name }}">{{ f.name }}s</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="ui right search item">
+                        <div class="ui transparent icon input">
+                            <input id="search-plants" type="text" placeholder="Search species…">
+                            <i class="search icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="twelve wide centered column">
+            {# Use overflow-x: scroll so that mobile views don't freak out
+             # when the table is too wide #}
+            <div class=plantTable style="overflow-x: scroll;">
+                <table class="ui searchable sortable unstackable selectable celled table" >
+                    <thead>
+                        <tr>
+                            <th class="center aligned">SKU</th>
+                            <th class="sorted ascending">Family</th>
+                            <th>Species</th>
+                            <th>Supplier</th>
+                            <th class="center aligned">Location</th>
+                            <th class="center aligned">Size</th>
+                            <th class="center aligned">Quantity</th>
+                            <th class="center aligned">Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for p in plants %} {# | sort(attribute='Family.name') #}
+
+                     {% if p.quantity == 0 %}
+                       <tr class="disabled" onclick="window.location.href = '{{ url_for('plants.edit_inv', SKU=p.sku) }}'; ">  
+                     {% else %}
+                       <tr onclick="window.location.href = '{{ url_for('plants.edit_inv', SKU=p.sku) }}'; ">
+                     {% endif %}
+
+                            <td>{{ p.sku }}</td>
+                            <td class="family">{{ p.familyName() }}</td>
+                        
+                            <td>{{ p.shortName() }}</td>
+                            <td><a href="{{ url_for('main.vcard', supID=p.supplier() ) }}">
+                                <i class="address card icon"></i>
+                                {{ p.supplierName() }} </a>
+                            </td>
+                            <td class="center aligned">{{ p.location }}</td>
+                            <td class="right aligned">{{ p.size }} in.</td>
+                            <td class="right aligned">{{ p.quantity }}</td>
+                            <td class="left aligned">${{ p.price }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#search-plants').keyup(function () {
+                var searchText = $(this).val();
+                if (searchText.length > 0) {
+                    $('tbody td:icontains(' + searchText + ')').addClass('positive');
+                    $('td.positive').not(':icontains(' + searchText + ')').removeClass('positive');
+                    $('tbody td').not(':icontains(' + searchText + ')').closest('tr').addClass('hidden').hide();
+                    $('tr.hidden:icontains(' + searchText + ')').removeClass('hidden').show();
+                } else {
+                    $('td.positive').removeClass('positive');
+                    $('tr.hidden').removeClass('hidden').show();
+                }
+            });
+
+            $('#select-family').dropdown({
+                onChange: function (value, text, $selectedItem) {
+                    $('td.family:contains(' + value + ')').closest('tr').removeClass('hidden').show();
+                    $('td.family').not(':contains(' + value + ')').closest('tr').addClass('hidden').hide();
+                }
+            });
+        });
+    </script>
+{% endblock %}

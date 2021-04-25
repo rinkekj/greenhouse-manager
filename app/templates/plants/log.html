@@ -1,0 +1,151 @@
+{% extends 'layouts/base.html' %}
+{% import 'macros/form_macros.html' as f %}
+
+{% block custom_head_tags %}
+
+<style>
+  /*    font-family: 'IBM Plex Mono', monospace;   */
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+  
+  /*    font-family: 'VT323', monospace;    */
+  @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+  
+  .planttable {
+      font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .control-label {
+    display: none;
+  }
+</style> 
+
+{% endblock %}
+
+
+
+{% block content %}
+
+<div class="ui container">
+  <div class="ui text container">
+    <h4 class="ui horizontal divider header">
+      <i class="sticky note outline icon"></i> 
+      Plant Notes
+    </h4>
+    <div class="ui segments">
+      <div class="ui segment">
+        <div class="ui two column center aligned grid">
+            <div class="left aligned column">Species</div>
+            <div class="right aligned column"><i>{{var['plant']}}</i></div>
+        </div>
+      </div>
+      <div class="ui segment">
+        <div class="ui two column center aligned grid">
+            <div class="left aligned column">SKU</div>
+            <div class="right aligned column">{{var['id']}}</div>
+        </div>
+      </div>
+      <div class="ui segment">
+        <div class="ui two column center aligned grid">
+            <div class="left aligned column">Last watered</div>
+            <div class="right aligned column">{{var['water']}}</div>
+        </div>
+      </div>
+      <div class="ui segment">
+        <div class="ui two column center aligned grid">
+            <div class="left aligned column">Last feeding</div>
+            <div class="right aligned column">{{var['feed']}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+    {% if numNotes is not eq 0 %}
+    <br>
+    <div class="ui text container">
+      <h4 class="ui horizontal divider header">
+        <i class="book icon"></i> 
+          Log Entries
+      </h4>
+      <div class="ui segments">
+      {% for item in notes %}
+          <div class="ui segment">
+            <a class="ui black ribbon label">{{item}}</a>
+            <div class="ui stackable center aligned grid">
+
+              <div class="left aligned column">
+                <br>
+                {% for line in notes[item].split('\n') %}
+                  {{line}}<br>
+                {% endfor %}
+                </div>
+
+          </div>
+          </div>
+        
+      {% endfor %}
+      </div>
+    {% endif %}
+
+    </div>
+  </div>
+  <br>
+  <div class="ui text container">
+    <h4 class="ui horizontal divider header">
+      <i class="edit outline icon"></i> 
+      Add Event
+    </h4>
+
+    
+    {% set flashes = {
+      'error':   get_flashed_messages(category_filter=['form-error']),
+      'warning': get_flashed_messages(category_filter=['form-check-email']),
+      'info':    get_flashed_messages(category_filter=['form-info']),
+      'success': get_flashed_messages(category_filter=['form-success'])
+    } %}
+    
+
+    {{ f.begin_form(form, flashes) }}
+      <div class="ui segments">
+        <div class="ui segment">
+          <div class="ui two column center aligned grid">
+            <div class="left aligned column">Date</div>
+            <div class="right aligned column">{{form.date}}</div>
+          </div>
+        </div>
+        <div class="ui segment">
+          <div class="ui two column center aligned grid">
+            <div class="left aligned column">Water</div>
+            <div class="right aligned column">{{form.water}}</div>
+          </div>
+        </div>
+        <div class="ui segment">
+          <div class="ui two column center aligned grid">
+            <div class="left aligned column">Fertilizer</div>
+            <div class="right aligned column">{{form.feed}}</div>
+          </div>
+        </div>
+        <div class="ui segment">
+          <div class="ui two column center aligned grid">
+            <div class="left aligned column">Notes</div>
+            <div class="column"><textarea id="notes" name="notes" cols="50" rows="6"></textarea></div>
+          </div>
+        </div>
+        <div class="ui segment">
+          <div class="ui center aligned grid">
+            <div class="centered column">{{form.submit}}</div>
+          </div>
+        </div>
+      </div>
+      {{ f.form_message(flashes['error'], header='Error.', class='error') }}
+      {{ f.form_message(flashes['warning'], header='Warning!', class='warning') }}
+      {{ f.form_message(flashes['info'], header='Information', class='info') }}
+      {{ f.form_message(flashes['success'], header='Success!', class='success') }}
+
+    {{ f.end_form(form) }}
+
+  </div>
+</div>
+
+{% endblock %}

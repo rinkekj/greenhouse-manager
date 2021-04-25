@@ -1,0 +1,52 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+    <h2 class="ui center aligned icon header">
+      <i class="circular leaf icon"></i>
+      Greenhouse Manager
+    </h2>
+
+    <div class="ui three column doubling stackable grid container">
+
+
+      <div class="column"></div>
+      <div class="column">
+        <a href="{{ url_for('main.inventory') }}">
+        <div class="ui center aligned segment">
+          <h3 class="ui black header">Inventory</h3></div></div></a>
+      <div class="column"></div>
+
+
+      <div class="column"></div>
+      <div class="column">
+        <a href="{{ url_for('plants.search') }}">
+        <div class="ui center aligned segment">
+          <h3 class="ui black header">Import species</h3></div></div></a>
+      <div class="column"></div>
+
+      <div class="column"></div>
+      <div class="column">
+        <a href="{{ url_for('plants.water') }}">
+        <div class="ui center aligned segment">
+          <h3 class="ui black header">Watering calendar</h3></div></div></a>
+      <div class="column"></div>
+
+      <div class="column"></div>
+      <div class="column">
+        <a href="{{ url_for('main.speciesDB') }}">
+        <div class="ui center aligned segment">
+          <h3 class="ui black header">View SpeciesDB</h3></div></div></a>
+      <div class="column"></div>
+
+      <div class="column"></div>
+      <div class="column">
+        <a href="{{ url_for('main.checkout') }}">
+        <div class="ui center aligned segment">
+          <h3 class="ui black header">Checkout</h3></div></div></a>
+      <div class="column"></div>
+
+      
+
+
+
+{% endblock %}

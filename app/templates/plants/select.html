@@ -1,0 +1,42 @@
+{% extends 'layouts/base.html' %}
+{% import 'macros/form_macros.html' as f %}
+
+{% block content %}
+    <div class="ui stackable centered grid container">
+        <div class="twelve wide column">
+            <a class="ui basic compact button" href="{{ url_for('plants.search') }}">
+                <i class="caret left icon"></i>
+                Search again
+            </a>
+            <h2 class="ui header">
+                Add Plant
+                <div class="sub header">Select from list of valid species</div>
+            </h2>
+
+            {% set flashes = {
+                'error':   get_flashed_messages(category_filter=['form-error']),
+                'success': get_flashed_messages(category_filter=['form-success'])
+            } %}
+
+            {% if form.number_of_results() != 0 %}
+                {{ f.begin_form(form, flashes) }}
+
+                    {{ f.render_form_field(form.plantInfo) }}
+
+                    {% for field in form | selectattr('type', 'equalto', 'SubmitField') %}
+                        {{ f.render_form_field(field) }}
+                    {% endfor %}
+                    
+            {% else %}
+                <div>{{ form.number_of_results() }} results </div>
+            {% endif %}
+
+            {{ f.form_message(flashes['error'], header='Duplicate Entry', class='error') }}
+            {{ f.form_message(flashes['success'], header='Success!', class='success') }}
+
+            {{ f.end_form() }}
+
+        </div>
+    </div>
+{% endblock %}
+  
