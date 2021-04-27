@@ -1,6 +1,6 @@
 import os
 from flask import Blueprint, render_template, send_file, Flask, request, redirect, url_for
-from app import db, dprint, printSQL
+from app import db, dprint, printSQL, getShortID
 from flask_sqlalchemy import SQLAlchemy
 from flask_table import Table, Col
 from flask_login import current_user, login_required
@@ -157,7 +157,7 @@ def customers():
 @main.route('/checkout/<customerID>', methods=['GET', 'POST'])
 @login_required
 def checkout2( customerID ):
-    transaction = Sales()
+    transactionID = getShortID()
     items = []
     types = ['Plants','Supplies']
     for i in Item.query.all():
@@ -179,23 +179,31 @@ def checkout2( customerID ):
 
     if request.method == "POST":
 
-        for i in items:
-            qty = request.form.get(i['sku'])
-            if qty != '':
+        dprint(dir(request.form))
+        dprint(request.form.values())
+        for k in request.form.values():
+            if k.isnumeric():
+                dprint(dir(k))
+
+
+        for i in request.form.to_dict():
+            dprint(i, request.form[i])
+            if request.form[i].isnumeric():
                 cart = Sales(
+                    id = transactionID,
                     date = date.today(),
                     customer = customerID,
-                    item = i['sku'],
-                    qty = qty,
-                    salePrice = i['price'],
+                    item = i,
+                    qty = request.form[i],
+                    salePrice = items[i].price,
                     )
-                cart.id = transaction.id
                 db.session.add(cart)
-                merch = Item.query.filter_by(sku=cart.item).first()
-                merch.updateQty( -int(cart.qty) )
+                merch = Item.query.filter_by(sku=i).first()
+                merch.updateQty( -int(request.form[i]) )
                 db.session.commit()
-        return redirect(url_for('main.receipt', saleID=cart.id,  ))
-
+                return redirect(url_for('main.receipt', saleID=cart.id,  ))
+            else:
+                break
     return render_template('main/checkout.html',items=items, types=types)
 
 @main.route('/receipt/<saleID>', methods=['GET', 'POST'])

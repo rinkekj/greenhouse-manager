@@ -1,5 +1,5 @@
 from flask import ( Blueprint, abort, flash,redirect, render_template, request,url_for, make_response)
-from app.models import (Family, Genus, Species, Variety, Plant, Supplier, Item, Orders,)
+from app.models import (Family, Genus, Species, Variety, Plant, Supplier, Item, Orders, WaterLog)
 from app import db, dprint, printSQL
 from app.plants.forms import (PlantSearchForm, SelectForm, plantForm, plantInventoryForm, SpeciesForm, VarietyForm, waterForm, TaxonForm,)
 
