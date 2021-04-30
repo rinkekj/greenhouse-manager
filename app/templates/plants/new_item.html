@@ -22,17 +22,18 @@
                     {{ f.render_form_field(form.variety) }}
                 </div>
 
-                <div class="three fields">
+                <div class="two fields">
                     {{ f.render_form_field(form.size) }}
-                    {{ f.render_form_field(form.quantity) }}
-                    {{ f.render_form_field(form.price) }}
+                    {{ f.render_form_field(form.substrate) }}
+
                 </div>
                 <div class="two fields">
               {# if SKU != 0 #}
                     {# f.render_form_field(form.supplier, 'disabled') #}
                     {# f.render_form_field(form.date_received, 'disabled') #}
               {# else #}
-                    {{ f.render_form_field(form.supplier) }}
+                    {#{ f.render_form_field(form.supplier) }#}
+                    {{ f.render_form_field(form.parent) }}
                     {{ f.render_form_field(form.date_received) }}
               {# endif #}
                 </div>

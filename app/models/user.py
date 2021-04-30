@@ -48,12 +48,12 @@ class Employee(UserMixin, db.Model):
 
     def __init__(self, **kwargs):
         super(Employee, self).__init__(**kwargs)
-        if self.role is None:
-            if self.email == current_app.config['ADMIN_EMAIL']:
-                self.role = Role.query.filter_by(
-                    permissions=Permission.ADMINISTER).first()
-            if self.role is None:
-                self.role = Role.query.filter_by(default=True).first()
+        #if self.role is None:
+        #    if self.email == current_app.config['ADMIN_EMAIL']:
+        #        self.role = Role.query.filter_by(
+        #            permissions=Permission.ADMINISTER).first()
+        #    if self.role is None:
+        #        self.role = Role.query.filter_by(default=True).first()
 
     def full_name(self):
         return '%s %s' % (self.first_name, self.last_name)

@@ -100,39 +100,46 @@ class VarietyForm(TaxonForm):
 
 class plantForm(FlaskForm):
     family = SelectField(
-        'Family',
+        u'Family',
+        id='family_select',
         choices=[('0', '------'),],
         coerce=int,
-        id='family_select'
     )
     genus = SelectField(
-        'Genus',
+        u'Genus',
         id='genus_select',
         choices=[('0', '------'),],
         coerce=int,
     )
 
     species = SelectField(
-        'Species',
+        u'Species',
         id='species_select',
         choices=[('0', '------')],
         coerce=int,
     )
 
     variety = SelectField(
-        'Variety',
+        u'Variety',
         id='variety_select',
         choices=[('0', '------')],
         coerce=str,
     )
+    
+    substrate = SelectField(
+        u'Substrate',
+        id='substrate_select',
+        choices=[('0', '------'),],
+        coerce=int,
+    )
 
-    supplier = SelectField(
-        'Supplier',
-        id='supplier_select',
+    parent = SelectField(
+        u'Parent',
+        id='parent_select',
         choices=[('0', '------'),],
         coerce=str,
     )
-    
+    '''
     price = DollarField(u'Price',
                         round_always=True,
                         validators=[InputRequired(),])
@@ -142,6 +149,7 @@ class plantForm(FlaskForm):
                                 InputRequired(),
                                 NumberRange(min=1, max=500, message="Quantity can not be zero")
                             ])
+    '''
     size = IntegerField(u'Pot size (in)',
                         validators=[
                             InputRequired(),
@@ -161,6 +169,10 @@ class plantForm(FlaskForm):
     #for entry in Species.query.filter_by(genus=genID).all():
     #	data[entry.id] = entry.name
 
+
+class substrateForm(FlaskForm):
+    name = StringField(u'Name', validators=[InputRequired(),])
+    notes = StringField(u'Text', widget=TextArea(), validators=[InputRequired(),])
 
 class plantInventoryForm(FlaskForm):
     sku = StringField()

@@ -1,12 +1,12 @@
 from flask import ( Blueprint, abort, flash,redirect, render_template, request,url_for, make_response)
-from app.models import (Family, Genus, Species, Variety, Plant, Supplier, Item, Orders, WaterLog)
+from app.models import (Family, Genus, Species, Variety, Plant, Medium, Item, Orders, WaterLog)
 from app import db, dprint, printSQL
-from app.plants.forms import (PlantSearchForm, SelectForm, plantForm, plantInventoryForm, SpeciesForm, VarietyForm, waterForm, TaxonForm,)
+from app.plants.forms import (PlantSearchForm, SelectForm, plantForm, plantInventoryForm, SpeciesForm, VarietyForm, waterForm, TaxonForm, substrateForm)
 
 from wtforms.fields import (SelectField, StringField,)
 from wtforms.widgets import HiddenInput
 from flask.views import MethodView
-from flask_login import login_required
+from flask_login import login_required, current_user
 from app.decorators import admin_required
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import asc, desc, func, update
@@ -283,34 +283,21 @@ def new_plant():
     form.family.choices = choices
 
     choices = [ ('0', '--- Select one ---'), ]
-    for entry in Supplier.query.all():
+    for entry in Medium.query.all():
         data = (entry.id, entry.name)
         choices.append(data)
-    form.supplier.choices = choices
+    form.substrate.choices = choices
 
     if form.is_submitted():
         plant = Plant(
             species=form.species.data,
             size=form.size.data,
-            quantity=form.quantity.data,
-            price=form.price.data,
-            location = 'B'
+            substrate=form.substrate.data,
         )
         if form.variety.data is not 0:
             plant.variety = form.variety.data
         
         db.session.add(plant)
-
-        # If ADDING plants, add new Order as well
-        newOrder = Orders(
-            item = plant.sku,
-            qty = plant.quantity,
-            #assume 100% markup
-            price = ( decimal.Decimal(plant.price) / 2 ),
-            date_received = request.form['date_received'],
-            supplier = request.form['supplier']
-        )
-        db.session.add(newOrder)
         db.session.commit()
         db.session.refresh(plant)
 
@@ -340,46 +327,57 @@ def add_inv():
 def edit_inv(SKU):
     form = plantForm()
     success = False
+
+    choices = [('0', '--- Select one ---'),]
+    for entry in Family.query.all():
+        data = (entry.id, entry.name)
+        choices.append(data)
+    form.family.choices = choices
+
+    choices = [('0', '--- Select one ---'),]
+    for entry in Medium.query.all():
+        data = (entry.id, entry.name)
+        choices.append(data)
+    form.substrate.choices = choices
+
+    choices = [('0', '--- Select one ---'),]
+    for entry in Plant.query.all():
+        data = (entry.sku, '[{}] {} - {}"'.format(entry.sku, entry.shortName(), entry.size))
+        choices.append(data)
+    form.parent.choices = choices
+
+
     if SKU != '0':
         # If sku != 0, pre-fill form
         item = db.session.query(Plant).filter_by(sku=SKU).first()
         title = 'Edit'
         sub = 'Editing entry for plant <{}>'.format(item.sku)
 
-        famChoices = []
-        for entry in Family.query.all():
-            data = (entry.id, entry.name)
-            famChoices.append(data)
-
-        form.family.choices = famChoices
-        form.family.data = item.family()
-
         genChoices = []
-        for entry in Genus.query.filter_by(family=item.family()).all():
+        for entry in Genus.query.all():
             data = (entry.id, entry.name)
             genChoices.append(data)
 
-        form.genus.choices = genChoices
-        form.genus.data = item.genus()
-
         speChoices = []
-        for entry in Species.query.filter_by(genus=item.genus()).all():
+        for entry in Species.query.all():
             data = (entry.id, entry.name)
             speChoices.append(data)
         form.species.choices = speChoices
+
+        parChoices = []
+        for entry in Plant.query.filter_by(species=item.species).all():
+            data = (entry.sku, '[{}] {} - {}"'.format(entry.sku, entry.shortName(), entry.size))
+            parChoices.append(data)
+        form.parent.choices = parChoices
+
+        form.family.data = item.family()
+        form.genus.data = item.genus()
         form.species.data = item.species
-
+        form.parent.data = item.parent
         form.size.data = item.size
-        form.quantity.data = item.quantity
-        form.price.data = item.price
+        form.substrate.data = item.substrate
+        form.date_received.data = item.date_received
 
-        choices = [ ('0', '---'), ]
-        for entry in Supplier.query.all():
-            data = (entry.id, entry.name)
-            choices.append(data)
-        form.supplier.choices = choices
-        form.supplier.data = item.supplier()
-        form.date_received.data = item.dateRec()
 
         if item.variety is not None:
             varChoices = []
@@ -394,63 +392,58 @@ def edit_inv(SKU):
         title = 'Add New Plant to Inventory'
         sub = 'Select species from database'
 
-        choices = [('0', '--- Select one ---'),]
-        for entry in Family.query.all():
-            data = (entry.id, entry.name)
-            choices.append(data)
-        form.family.choices = choices
-
-        choices = [ ('0', '--- Select one ---'), ]
-        for entry in Supplier.query.all():
-            data = (entry.id, entry.name)
-            choices.append(data)
-        form.supplier.choices = choices
-
         if request.method == "POST":
-            item = Plant()
-            
-            item.species=request.form['species']
-            item.size=request.form['size']
-            item.quantity=request.form['quantity']
-            item.price=request.form['price']
+            item = Plant(
+                species = request.form['species'],
+                size = request.form['size'],
+                substrate = request.form['substrate'],
+                user = current_user.id,
+                date_received = request.form['date_received']
+            )
+
+            dprint(request.form['date_received'])
+
+
             if form.variety.data is not '0':
                 item.variety = request.form['variety']
+            else:
+                item.variety = None
 
+            if form.parent.data is not 0:
+                item.parent = request.form['parent']
 
-            # If ADDING plants, add new Order as well
-            newOrder = Orders(
-                item = item.sku,
-                qty = item.quantity,
-                #assume 100% markup
-                price = ( decimal.Decimal(item.price) / 2 ),
-                date_received = request.form['date_received'],
-                supplier = request.form['supplier']
-            )
-            
-            db.session.add(newOrder)
             db.session.add(item)
             try:
                 db.session.commit()
             except:
-                db.rollback()
-                flash('Uh oh, wont commit', 'form-warning')
-                return redirect(url_for('plants.edit_inv', SKU=item.sku))
+                flash('Problem adding plant to inventory'.format(
+                        item.sku, item.shortName()), 'form-error')
             else:
                 flash('SKU: {} | <i>{}</i> successfully added to inventory'.format(
                         item.sku, item.shortName()), 'form-success')
-                return redirect(url_for('plants.edit_inv', SKU=item.sku))
+
+            return redirect(url_for('plants.edit_inv', SKU=item.sku))
 
     if request.method == "POST":
-        
+        dprint(request.form['date_received'])
+        dprint(current_user)
         item.species=request.form['species']
         item.size=request.form['size']
-        item.quantity=request.form['quantity']
-        item.price=request.form['price']
+        item.substrate=request.form['substrate']
+        item.date_received=request.form['date_received']
         item.sku = SKU
+
+        dprint(type(request.form['parent']))
+
+
         if request.form['variety'] is not '0':
             item.variety=request.form['variety']
         else:
-            v = None
+            item.variety = None
+        if request.form['parent'] is not 0:
+            item.parent = request.form['parent']
+        else:
+            item.parent = None
         db.session.commit()
         dprint(item.__dict__)
 
@@ -635,6 +628,23 @@ def water():
                            calendar=calendar,
                            shortName=plantNames)
 
+
+@plants.route('/add/substrate', methods=['GET', 'POST'])
+def add_substrate():
+    form = substrateForm()
+    if form.validate_on_submit():
+        medium = Medium(
+            name = form.name.data,
+            notes = form.notes.data
+        )
+        db.session.add(medium)
+        try:
+            db.session.commit()
+        except:
+            dprint('whoops')
+        else:
+            return redirect(url_for('main.index'))
+    return render_template("plants/new-medium.html", form=form)
 
 @plants.route('/inventory')
 def inventory():

@@ -52,16 +52,16 @@
                 <div class="ui raised segment">
                     <h5 class="ui horizontal header divider">
                         <i class="archive icon"></i>
-                        Inventory
+                        Plants
                     </h5>
-                    {{ dashboard_option('Inventory', 'main.inventory',
-                                description='View and manage inventory', icon='tasks icon') }}
-                    {{ dashboard_option('Plant Check-in', 'plants.new_plant',
-                                description='Add plant inventory items', icon='clipboard outline icon') }}
-                    {{ dashboard_option('Supplies Check-in', 'main.supplier_list',
-                                description='Add general merchandise to inventory', icon='clipboard outline icon') }}
-                    {{ dashboard_option('Plants', 'admin.new_user',
+                    {{ dashboard_option('Water', 'plants.water',
                                 description='View and edit plant inventory', icon='leaf icon') }}
+                    {{ dashboard_option('Plant Check-in', 'plants.add_inv',
+                                description='Add plant inventory items', icon='clipboard outline icon') }}
+                    {{ dashboard_option('View Plants', 'admin.new_user',
+                                description='View and edit plant inventory', icon='leaf icon') }}
+                    {{ dashboard_option('Plant Inventory', 'main.inventory',
+                                description='View and manage inventory', icon='tasks icon') }}
                     </div>
                 </div>
                 <div class="column">
@@ -72,12 +72,12 @@
                         </h5>
                     {{ dashboard_static('Import species', 'plants.search',
                                 description='Search for new species using trefle.io', pic='trefle-logo.svg') }}
-                    {{ dashboard_option('Add Species', 'plants.add_species',
+                    {{ dashboard_option('New Species', 'plants.add_species',
                                 description='Manually enter new species', icon='edit outline icon') }}
-                    {{ dashboard_option('Add Cultivar', 'plants.add_variety',
+                    {{ dashboard_option('New Cultivar', 'plants.add_variety',
                                 description='Manually enter new species variety', icon='edit outline icon') }}
-                    {{ dashboard_option('Watering', 'plants.water',
-                                description='View watering schedule', icon='tint icon') }}
+                    {{ dashboard_option('New Substrate', 'plants.add_substrate',
+                                description='View watering schedule', icon='plus square outline icon') }}
                 </div>
                 </div>
 

@@ -61,12 +61,5 @@ INSERT INTO `varieties` VALUES \
 	('V9XKH','\"Cebu Blue\"',132808),
 	('Y473K','\"Jade\"',123796);
 
-INSERT INTO `contacts` VALUES \
-	('94J5R','George','Tully','george@tullysgreenhouse.com',2486898735),
-	('NinFG','Hank','Scorpio','hankscorpio@globex.com',8001418533),
-	('TWrXN','Yosemite','Sam','y.sam@acme.com',5055571941);
-
-INSERT INTO `suppliers` VALUES \
-	('ZJ9Mz','Globex Corporation','533 Globex Dr','Canfield','OH',44406,'NinFG'),
-	('TGKmf','Tully\'s Greenhouse','3103 John R. Rd.','Troy','MI',48083,'94J5R'),
-	('TAGda','Acme Argricultural Supply','101 Cayote Dr','Albuquerque','NM',87104,'TWrXN');
+INSERT INTO `employees` VALUES \
+	(2,'Kevin','Rinke','kevin.rinke@gmail.com','pbkdf2:sha256:150000$k0QTc9zo$3781c47fa15d8bc079549207327c8ff6dd253cd2f8e49771020971040c314fe2',1);

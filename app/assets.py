@@ -10,6 +10,5 @@ vendor_js = Bundle('vendor/jquery.min.js',
                    'vendor/semantic.min.js',
                    'vendor/tablesort.min.js',
                    'vendor/zxcvbn.js',
-                   'vendor/select.min.js',
                    filters='jsmin',
                    output='scripts/vendor.js')

@@ -226,3 +226,4 @@ cython_debug/
 
 # greenhouse-manager
 config.env
+data

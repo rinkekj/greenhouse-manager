@@ -38,8 +38,6 @@ packaging==19.1
 phonenumbers==8.12.21
 phonenumberslite==8.12.21
 pipupgrade==1.5.1
-pkg-resources==0.0.0
-psycopg2==2.8.3
 pyparsing==2.4.2
 python-dateutil==2.8.0
 python-editor==1.0.4

@@ -24,8 +24,8 @@ class Family(db.Model):
 class Genus(db.Model):
     __tablename__ = 'genera'
     id = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
-    name = db.Column(db.Unicode(length=25), unique=False)
     family = db.Column(db.Integer, db.ForeignKey('families.id'), nullable=False)
+    name = db.Column(db.Unicode(length=25), unique=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -36,8 +36,8 @@ class Genus(db.Model):
 class Species(db.Model):
     __tablename__ = 'species'
     id = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
-    name = db.Column(db.Unicode(length=25), unique=False, nullable=False)
     genus = db.Column(db.Integer, db.ForeignKey('genera.id'), nullable=False)
+    name = db.Column(db.Unicode(length=25), unique=False, nullable=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -55,14 +55,17 @@ class Species(db.Model):
 
 class Variety(db.Model):
     __tablename__ = 'varieties'
-    id = db.Column(db.Unicode(length=5),
-                   primary_key=True,
-                   unique=True,
-                   nullable=False)
+    id = db.Column(
+                    db.Unicode(length=5),
+                    primary_key=True,
+                    unique=True,
+                    nullable=False)
+    species = db.Column(
+                    db.Integer,
+                    db.ForeignKey('species.id'),
+                    nullable=False)
     name = db.Column(db.Unicode(length=50), nullable=False)
-    species = db.Column(db.Integer,
-                        db.ForeignKey('species.id'),
-                        nullable=False)
+
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -88,24 +91,53 @@ class Variety(db.Model):
         return '<Variety \'%s\'>' % self.name
 
 ##########################################################
+#	Substrates
+##########################################################
+class Medium(db.Model):
+    __tablename__ = 'substrates'
+    id = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
+    name = db.Column(db.Unicode(length=25), unique=False, nullable=False)
+    notes = db.Column(db.Text)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def __repr__(self):
+        return '<Medium \'{}\'>'.format(self.name)
+
+##########################################################
 #	Physical inventory (plants, merchandise
 ##########################################################
-class Plant(Item):
+class Plant(db.Model):
     __tablename__ = 'plants'
-    __mapper_args__ = {'polymorphic_identity': True}
+    #__mapper_args__ = {'polymorphic_identity': True}
     sku = db.Column(db.Unicode(length=5),
-                    db.ForeignKey('items.sku'),
                     unique=True, 
                     primary_key=True
                     )
-    species = db.Column(db.Integer,db.ForeignKey('species.id'))
-    variety = db.Column(db.Unicode(length=5), db.ForeignKey('varieties.id'))
+    species = db.Column(db.Integer,
+                    db.ForeignKey('species.id'),
+                    )
+    variety = db.Column(db.Unicode(length=5),
+                    db.ForeignKey('varieties.id'),
+                    nullable=True
+                    )
     size = db.Column(db.Integer)
+    user = db.Column(db.Integer, 
+                    db.ForeignKey('employees.id'),
+                    )
+    date_received = db.Column(db.Date)
+    substrate = db.Column(db.Integer,
+                    db.ForeignKey('substrates.id'),
+                    )
+    parent = db.Column(db.Unicode(length=5),
+                    db.ForeignKey('plants.sku'),
+                    nullable=True
+                    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.sku = getShortID()
-        self.living = True
 
     def family(self):
         famID = db.session.query(Genus.family)\
@@ -190,69 +222,6 @@ class Plant(Item):
     def __repr__(self):
         return '<Plant \'{}\'>'.format(self.sku)
 
-    @staticmethod
-    def generate_fake(count, **kwargs):
-        """Generate a number of fake users for testing."""
-        from sqlalchemy.exc import IntegrityError
-        from random import seed, choice, randrange
-        from faker import Faker
-
-        zones = {'A': (32,218), 
-                 'B': (45,65,495),
-                 'C': (69,149),
-                 'D': (54,616)
-                 }
-
-        fake = Faker()
-        seed()
-
-        varietiesAvailable = db.session\
-            .query(Species.id, Variety.id)\
-            .join(Species, Species.id == Variety.species)\
-            .all()
-
-        speciesAvailable = db.session\
-            .query(Species.id)\
-            .all()
-        plants = []
-        plantsCreated = []
-        for i in varietiesAvailable:
-            plants.append(i)
-        for j in speciesAvailable:
-            rand = j
-            plants.append(rand)
-        for i in range(count):
-            randPlant = plants[randrange(1, len(plants), 1)]
-
-            p = Plant(**kwargs)
-            p.size = randrange(3, 12, 1)
-            p.quantity = randrange(5, 25, 5)
-
-            if len(randPlant) == 2:
-                p.species = randPlant[0]
-                p.variety = randPlant[1]
-            else:
-                p.species = randPlant.id
-
-            if p.size >= 7:
-                p.price = randrange(19, 59, 1) + 0.99
-            else:
-                p.price = randrange(4, 20, 2) + 0.99
-
-            db.session.add(p)
-            
-            fam = p.family()
-            for z in zones:
-                if fam in zones[z]:
-                    p.location = z
-                    break            
-            try:
-                db.session.commit()
-            except IntegrityError:
-                db.session.rollback()
-            else:
-                plantsCreated.append(p)
-        return plantsCreated
 
 ##########################################################
 #	Watering Log

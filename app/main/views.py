@@ -158,34 +158,31 @@ def customers():
 @login_required
 def checkout2( customerID ):
     transactionID = getShortID()
-    items = []
-    types = ['Plants','Supplies']
+    items = {}
     for i in Item.query.all():
         if i.quantity != 0:
             if i.living == True:
-                items.append(dict( name=i.shortName(),
-                             sku=i.sku,
-                             quantity=i.quantity,
-                             price=i.price,
-                             type = types[0],
-                             ))
+                items[ i.sku ] = {
+                            'name' : i.shortName(),
+                            'sku' : i.sku,
+                            'quantity' : i.quantity,
+                            'price' : i.price,
+                            'type' : 'Plants',
+                            }
             else:
-                items.append(dict( name=i.name,
-                             sku=i.sku,
-                             quantity=i.quantity,
-                             price=i.price,
-                             type = types[1],
-                             ))
+                items[ i.sku ] = { 
+                            'name' : i.name,
+                            'sku' : i.sku,
+                            'quantity' : i.quantity,
+                            'price' : i.price,
+                            'type' : 'Supplies',
+                            }
 
     if request.method == "POST":
 
         dprint(dir(request.form))
         dprint(request.form.values())
-        for k in request.form.values():
-            if k.isnumeric():
-                dprint(dir(k))
-
-
+        #for k in request.form.values():
         for i in request.form.to_dict():
             dprint(i, request.form[i])
             if request.form[i].isnumeric():
